@@ -40,6 +40,8 @@ if(isset($_POST["Submit"])){
 
    $Execute =$stmt->execute();
 
+  move_uploaded_file($_FILES["Image"]["tmp_name"],$Target);
+
    if($Execute){
      $_SESSION["SuccessMessage"]="post with id : ".$ConnectingDB-> lastInsertId() ."added successfully";
      Redirect_to("AddNewPost.php");
@@ -51,7 +53,7 @@ if(isset($_POST["Submit"])){
 }
 
 
-} //end if submit button 
+} //end if submit button
 
  ?>
 
