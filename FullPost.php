@@ -1,3 +1,55 @@
+<?php require_once('Includes/DB.php'); ?>
+<?php require_once('Includes/Functions.php'); ?>
+<?php require_once("Includes/Sessions.php"); ?>
+<?php $SearchQueryParameter = $_GET["id"]; ?>
+<?php
+
+if(isset($_POST["Submit"])){
+  $Name = $_POST["CommenterName"];
+  $Email = $_POST["CommenterEmail"];
+  $Comment =$_POST["CommenterThoughts"];
+
+  date_default_timezone_set("Europe/Berlin");
+  $CurrentTime=time();
+  $DateTime=strftime("%B-%d-%Y %H:%M:%S", $CurrentTime);
+
+  if(empty($Name) || empty($Email) || empty($Comment)){
+    $_SESSION["ErrorMessage"] = "All fields must be filled out";
+    Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+  }elseif (strlen($Comment)>500){
+    $_SESSION["ErrorMessage"] = "Comment should be greater than 500 characters";
+    Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+
+}else{
+  // query to insert category
+  global $ConnectingDB;
+   $sql = "INSERT INTO comments (datetime, name,email,comment,approvedby, status,post_id)";
+   $sql .= "VALUES(:datetime, :name, :email, :comment, 'Pending', 'OFF', :postIdFromURL)";
+   $stmt = $ConnectingDB ->prepare($sql);
+   $stmt->bindValue(':datetime', $Datetime);
+   $stmt->bindValue(':name', $Name);
+  $stmt->bindValue(':email', $Email);
+   $stmt->bindValue(':comment', $Comment);
+  $stmt->bindValue(':postIdFromURL', $SearchQueryParameter);
+   $Execute =$stmt->execute();
+
+   if($Execute){
+     $_SESSION["SuccessMessage"]=" comment added successfully";
+     Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+   }else {
+     $_SESSION["ErrorMessage"]="Something went wrong";
+     Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+   }
+
+}
+
+
+}
+
+ ?>
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -97,7 +149,10 @@ else {
      <div class="col-sm-8">
    <h1>RESPOSNIVE CMS BLOG  </h1>
     <h1 class="lead">BLOG by using PHP by me</h1>
-
+    <?php
+    echo ErrorMessage();
+    echo SuccessMessage();
+     ?>
   <?php
   global $ConnectingDB;
   $sql= "SELECT * FROM posts ORDER BY id desc";
@@ -126,9 +181,84 @@ else {
     </div>
 </div>
 <?php } ?>
+<!-- comment area -->
+<!-- display existing comment -->
+<span class="FieldInfo">Comments </span>
+<br>
+<?php
+global $ConnectingDB;
+$sql = "SELECT * FROM comments
+WHERE  post_id='$SearchQueryParameter' AND status='ON'";
+$stmt =$ConnectingDB->query($sql);
+while ($DateRows= $stmt ->fetch()){
+$CommentDate = $DateRows['datetime'];
+$CommenterName = $DataRows['name'];
+$CommentContent = $DataRows['comment'];
+?>
+<div >
 
-     </div>
-     <div class="col-sm-4">
+ <div class="media CommentBlock">
+   <img class="d-block img-fluid align-self-start" src="images/comment.png" alt="">
+<div class="media-body ml-2">
+  <h6 class="lead"><?php echo $CommenterName; ?></h6>
+  <p class="small"><?php echo $CommentDate; ?></p>
+  <p><?php echo $CommentContent; ?> </p>
+
+
+</div>
+</div>
+</div>
+<br>
+<hr>
+<?php } ?>
+
+<!-- end display existing commen -->
+
+
+<div class="">
+<form class="" action="FullPost.php?id=<?php echo $SearchQueryParameter ?>" method="post">
+<div class="card mb-3">
+ <div class="card-header">
+<h5 class="FieldInfo">Share your thoughts abouts this posts</h5>
+ </div>
+ <div class="card-body">
+      <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+       <span class="input-group-text"> <i class="fa fa-user"></i></span>
+            </div>
+  <input class="form-control" type="text" name="CommenterName" placeholde="name" value="">
+         </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+          <div class="input-group-prepend">
+     <span class="input-group-text"> <i class="fa fa-envelope"></i></span>
+          </div>
+<input class="form-control" type="email" name="CommenterEmail" placeholde="Email" value="">
+       </div>
+  </div>
+   <div class="form-group">
+     <textarea name="CommenterThoughts" class="form-control" row="6" cols="80"></textarea>
+  </div>
+    <div class="">
+   <button type="submit" name="Submit" class="btn btn-primary">Submit</button>
+
+    </div>
+
+
+
+
+
+</div>
+
+
+</form>
+</div>
+<!-- end comments area -->
+</div><!-- end main area -->
+
+     <div class="col-sm-4"><!-- side area -->
 
 
      </div>
