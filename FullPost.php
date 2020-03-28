@@ -61,8 +61,12 @@
   }
 // THE DEFAULT SQL QUERY
 else {
-
-  $sql= "SELECT * FROM posts ORDER BY id desc";
+  $PostIdFromURL = $_GET["id"];
+  if(!isset($PostIdFromURL)){
+    $_SESSION["ErrorMessage"] =" bad request";
+    Redirect_to("Blog.php");
+  }
+  $sql= "SELECT * FROM posts WHERE id= '$PostIdFromURL'";
   $stmt = $ConnectingDB->query($sql);
 }
 
@@ -93,10 +97,7 @@ else {
      <div class="col-sm-8">
    <h1>RESPOSNIVE CMS BLOG  </h1>
     <h1 class="lead">BLOG by using PHP by me</h1>
-    <?php
-    echo ErrorMessage();
-    echo SuccessMessage();
-     ?>
+
   <?php
   global $ConnectingDB;
   $sql= "SELECT * FROM posts ORDER BY id desc";
@@ -119,14 +120,9 @@ else {
     <span class="badge badge-dark text-light float-right" style="float:">Comments 20</span>
 
       <hr>
-       <p class="card-text"><?php
-  if(strlen($PostDescription )>150){
-    $PostDescription= substr($PostDescription, 0 ,150)."...";
-  }  echo htmlentities ($PostDescription); ?>
+       <p class="card-text"><?php echo htmlentities ($PostDescription); ?>
        </p>
-       <a href="FullPost.php?id=<?php echo $PostId; ?>" style="float:right;">
-         <span class="btn btn-info">Read More >> </span>
-       </a>
+
     </div>
 </div>
 <?php } ?>

@@ -1,6 +1,44 @@
 <?php require_once('Includes/DB.php'); ?>
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
+<?php
+$SearchQueryParameter = $_GET['id'];
+
+//fetching existing content
+global $ConnectingDB;
+$SearchQueryParameter = $_GET["id"];
+$sql = "SELECT * FROM posts WHERE id='$SearchQueryParameter'";
+$stmt =$ConnectingDB ->query($sql);
+while ($DataRows=$stmt->fetch()){
+  $TitleToBeUpdated =$DataRows['title'];
+  $CategoryTobeUpadated = $DataRows['category'];
+  $ImageTobeDeleted = $DataRows['image'];
+  $PostTobeUpadated = $DataRows['post'];
+  //code ...
+}
+
+
+if(isset($_POST["Submit"])){
+
+  // query to delete posts
+   global $ConnectingDB;
+  $sql = "DELETE FROM posts WHERE id='$SearchQueryParameter'";
+$Execute =$ConnectingDB-> query($sql);
+//  move_uploaded_file($_FILES["Image"]["tmp_name"],$Target);
+
+   if($Execute){
+     $Target_Path_To_DELETE_Image ="Uploads/$ImageTobeDeleted";
+     unlink($Target_Path_To_DELETE_Image);
+     $_SESSION["SuccessMessage"]=" Post Deleted successfully";
+     Redirect_to("Posts.php");
+   }else {
+     $_SESSION["ErrorMessage"]="something went wrong";
+     Redirect_to("Posts.php");
+   }
+
+} //end if submit button
+
+ ?>
 
 <!doctype html>
 <html lang="en">
@@ -64,101 +102,74 @@
    <div class="container">
      <div class="row">
        <div class="col-md-12">
-           <h1><i class="fa fa-blog mr-3" style="color:yellow"></i>Blog Posts</h1>
+           <h1><i class="fa fa-edit mr-3" style="color:yellow"></i>Delete post</h1>
+
         </div>
-<div class="col-lg-3 mb-2">
-  <a href="AdNewPost.php" class="btn btn-primary btn-block">
-    <i class="fa fa-edit"></i>Add New Post
- </a>
-</div>
-
-<div class="col-lg-3  mb-2">
-  <a href="Categories.php" class="btn btn-info btn-block">
-    <i class="fa fa-folder-plus"></i>Add New  Category
- </a>
-</div>
-<div class="col-lg-3  mb-2">
-  <a href="Admins.php" class="btn btn-warning btn-block">
-    <i class="fa fa-user-plus"></i>Add New   Admin
- </a>
-</div>
-<div class="col-lg-3  mb-2">
-  <a href="Comments.php" class="btn btn-success btn-block">
-    <i class="fa fa-check"></i>Add New  Comments
- </a>
-</div>
-
-
 
       </div>
+
     </div>
 </header>
 <!-- end header-->
 <!-- Main area-->
+
 <section class="container py-2 mb-4">
-<div class="row">
-  <div class="col-lg-12">
-    <?php
-    echo ErrorMessage();
-    echo SuccessMessage();
-     ?>
- <table class="table table-striped">
-   <thead class="thead-dark">
-<tr>
-<th> #</th>
-<th> Title</th>
-<th> Category</th>
-<th> Date &time</th>
-<th> Author</th>
-<th>Banner </th>
-<th>Comments</th>
-<th> Action</th>
-<th> live Preview </th>
-<tr>
-</thead>
-   <?php
-  global $ConnectingDB;
-  $sql= "SELECT *FROM posts";
-  $stmt = $ConnectingDB->query($sql);
-  $Sr = 0;
-  while ($DateRows = $stmt->fetch()){
-    $Id  = $DateRows["id"];
-    $DateTime =$DateRows["datetime"];
-    $PostTitle =$DateRows["title"];
-    $Category  =$DateRows["category"];
-    $Admin  =$DateRows["author"];
-    $Image  =$DateRows["image"];
-    $PostText = $DateRows["post"];
-    $Sr++;
-    ?>
-    <tbody>
-    <tr>
-      <td><?php echo $Sr; ?></td>
-      <td>
-<?php if(strlen($PostTitle) >20) {$PostTitle= substr($PostTitle,0,15)."...";}
-       echo $PostTitle; ?>
-     </td>
-      <td><?php echo $Category; ?></td>
-      <td><?php echo $DateTime; ?></td>
-          <td><?php
-    if(strlen($Admin) >6) {$PostTitle= substr($Admin,0,8)."...";}
-      echo $Admin; ?>
-         </td>
-      <td><img src="Uploads/<?php echo $Image; ?>" width="168px" height="50px"></td>
-      <td>Comments</td>
-      <td>
-      <a href="EditPost.php?id=<?php echo $Id; ?>"><span class="btn btn-warning">Edit</span></a>
-      <a href="DeletePost.php?id=<?php echo $Id; ?>"><span class="btn btn-danger">  Delete</span></a>
-      </td>
-      <td> <a href="FullPost.php?id=<?php echo $Id; ?>"><span class="btn btn-primary"> Live Preview </span></a> </td>
+  <div class="row">
+    <div class="offset-lg-1 col-lg-10" style="min-height:400px;">
+      <?php
 
-    </tr>
-  </tbody>
-  <?php } ?>
-</table>
+       ?>
+      <form class="" action="DeletePost.php?id=<?php echo $SearchQueryParameter;  ?>" method="post" enctype="multipart/form-data">
+           <div class="card bg-secondary text-light mb-3">
+                      <div class="card-header">
+           <h1>         Delete  Post</h1>
+                      </div>
+         <div class="card-body bg-dark">
+              <div class="form-group">
+                   <label for="title"><span class="FieldInfo">Post title: </span> </label>
+                     <input disabled class="form-control" type="text" name="PostTitle" id="title" value="<?php  echo $TitleToBeUpdated; ?>">
+              </div>
+              <div class="form-group">
+                 <span class="FieldInfo">Existing Category: </span>
+                 <?php echo  $CategoryTobeUpadated; ?>  <br>
 
+              </div>
+
+               <div class="form-group mb-1">
+                  <span class="FieldInfo">ExistingImage: </span>
+                  <img class="mb-2" src="Uploads/<?php echo $ImageTobeDeleted; ?>" width:"" 170px"; height: "70px"; >
+                    <div class="custom-file">
+
+                  <input class="custom-file-input" type="File" id="imageSelect" name="Image" value="">
+                    <label for="ImageSelect" class="custom-file-label"> Select Image  </label>
+                    </div>
+               </div>
+            <div class="form-group">
+      <label for="CategoryTitle"><span class="FieldInfo">Post: </span> </label>
+      <textarea disabled class="form-control" id="Post" name="PostDescription" rows="8" cols="80">
+        <?php echo $PostTobeUpadated; ?>
+      </textarea>
+            </div>
+
+              <div class="row" style="min-height:50px; background:#D5FFBF;">
+                 <div class="col-lg-6">
+         <a href="Dashboard.php" class="btn btn-warning btn-block"><i class="fas f-arrow-left"></i>Back to Dashboard</a>
+                 </div>
+                 <div class="col-lg-6">
+         <button type="submit" name="Submit" class="btn btn-danger btn-block">
+           <i class="fa fa-trash">
+
+           </i>Delete</button>
+                 </div>
+              </div>
+
+
+
+            </div>
+           </div>
+     </form>
+    </div>
   </div>
-</div>
 
 
 </section>

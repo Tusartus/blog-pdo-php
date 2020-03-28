@@ -2,7 +2,7 @@
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
 <?php
-
+$SearchQueryParameter = $_GET['id'];
 if(isset($_POST["Submit"])){
   $PostTitle = $_POST["PostTitle"];
   $Category = $_POST["Category"];
@@ -16,38 +16,38 @@ if(isset($_POST["Submit"])){
 
   if(empty($PostTitle)){
     $_SESSION["ErrorMessage"] = "Title can be empty";
-    Redirect_to("AddNewPost.php");
+    Redirect_to("Posts.php");
   }elseif (strlen($PostTitle)<5){
     $_SESSION["ErrorMessage"] = "Post title should be greater than 5 characters";
-    Redirect_to("AddNewPost.php");
+    Redirect_to("Posts.php");
 
   }elseif (strlen($PostText) > 99999){
       $_SESSION["ErrorMessage"] = "Post Description should be less than 10000 characters";
-      Redirect_to("AddNewPost.php");
+      Redirect_to("Posts.php");
 
 }else{
-  // query to insert category
+  // query to update posts
    global $ConnectingDB;
-   $sql = "INSERT INTO posts (datetime,title,category, author,image,post)";
-   $sql .= "VALUES(:datetime,:postTitle, :categoryName, :adminName, :imageName, :postDescription )";
-   $stmt = $ConnectingDB ->prepare($sql);
+   if(!empty($_FILES["Image"]["name"])){
+     $sql = "UPDATE posts SET
+     title='$PostTitle', category='$Category', image='$Image', post='$PostText'
+      WHERE id='$SearchQueryParameter' ";
+   }else{
+     $sql = "UPDATE posts SET
+     title='$PostTitle', category='$Category', post='$PostText'
+      WHERE id='$SearchQueryParameter' ";
+   }
 
-   $stmt->bindValue(':datetime', $DateTime);
-   $stmt->bindValue(':postTitle', $PostTitle);
-   $stmt->bindValue(':categoryName', $Category);
-   $stmt->bindValue(':adminName', $Admin);
-   $stmt->bindValue(':imageName', $Image);
 
-   $Execute =$stmt->execute();
-
+$Execute =$ConnectingDB-> query($sql);
   move_uploaded_file($_FILES["Image"]["tmp_name"],$Target);
 
    if($Execute){
-     $_SESSION["SuccessMessage"]="post with id : ".$ConnectingDB-> lastInsertId() ."added successfully";
-     Redirect_to("AddNewPost.php");
+     $_SESSION["SuccessMessage"]=" Post Updated successfully";
+     Redirect_to("Posts.php");
    }else {
-     $_SESSION["ErrorMessage"]="Post not added, something went wrong";
-     Redirect_to("AddNewPost.php");
+     $_SESSION["ErrorMessage"]="something went wrong";
+     Redirect_to("Posts.php");
    }
 
 }
@@ -134,20 +134,42 @@ if(isset($_POST["Submit"])){
   <div class="row">
     <div class="offset-lg-1 col-lg-10" style="min-height:400px;">
       <?php
-      echo ErrorMessage();
-      echo SuccessMessage();
+
+     //fetching existing content
+     global $ConnectingDB;
+     $SearchQueryParameter = $_GET["id"];
+     $sql = "SELECT * FROM posts WHERE id='$SearchQueryParameter'";
+     $stmt =$ConnectingDB ->query($sql);
+     while ($DataRows=$stmt->fetch()){
+       $TitleToBeUpdated =$DataRows['title'];
+       $CategoryTobeUpadated = $DataRows['category'];
+       $ImageTobeUpadated = $DataRows['image'];
+       $PostTobeUpadated = $DataRows['post'];
+       //code ...
+
+
+
+
+     }
+
+
+
+
+
        ?>
-      <form class="" action="AddNewPost.php" method="post" enctype="multipart/form-data">
+      <form class="" action="EditPost.php?id=<?php echo $SearchQueryParameter;  ?>" method="post" enctype="multipart/form-data">
            <div class="card bg-secondary text-light mb-3">
                       <div class="card-header">
-           <h1>Add new Post</h1>
+           <h1>         EDIT  Post</h1>
                       </div>
          <div class="card-body bg-dark">
               <div class="form-group">
                    <label for="title"><span class="FieldInfo">Post title: </span> </label>
-                     <input  class="form-control" type="text" name="PostTitle" id="title" placeholder="type title here">
+                     <input  class="form-control" type="text" name="PostTitle" id="title" value="<?php  echo $TitleToBeUpdated; ?>">
               </div>
               <div class="form-group">
+                 <span class="FieldInfo">Existing Category: </span>
+                 <?php echo  $CategoryTobeUpadated; ?>  <br>
                    <label for="CategoryTitle"><span class="FieldInfo">choose category: </span> </label>
                      <select  class="form-control"  name="Category" id="CategoryTitle">
                      <?php
@@ -167,6 +189,8 @@ if(isset($_POST["Submit"])){
               </div>
 
                <div class="form-group mb-1">
+                  <span class="FieldInfo">ExistingImage: </span>
+                  <img class="mb-2" src="Uploads/<?php echo $ImageTobeUpadated; ?>" width:"" 170px"; height: "70px"; >
                     <div class="custom-file">
 
                   <input class="custom-file-input" type="File" id="imageSelect" name="Image" value="">
@@ -175,7 +199,9 @@ if(isset($_POST["Submit"])){
                </div>
             <div class="form-group">
       <label for="CategoryTitle"><span class="FieldInfo">Post: </span> </label>
-      <textarea class="form-control" id="Post" name="PostDescription" rows="8" cols="80"></textarea>
+      <textarea class="form-control" id="Post" name="PostDescription" rows="8" cols="80">
+        <?php echo $PostTobeUpadated; ?>
+      </textarea>
             </div>
 
               <div class="row" style="min-height:50px; background:#D5FFBF;">
