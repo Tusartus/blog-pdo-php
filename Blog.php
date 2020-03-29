@@ -129,7 +129,15 @@ else {
    <img src="Uploads/<?php echo htmlentities ($Image); ?>" style="max-height:450px;" class="img-fluid card-img-top" />
    <div class="card-body">
        <h4 class="card-title"><?php echo htmlentities($PostTitle);  ?></h4>
-       <small class="card-title">Written by <?php echo htmlentities ($Admin); ?> On <?php echo htmlentities ( $DateTime); ?> </small>
+       <small class="card-title"> Category:
+         <a href="Blog.php?category=<?php echo $Category; ?>">
+         <span class="heading"><?php echo htmlentities($Category); ?></span>
+         </a>
+           & Written by
+         <a href="Profile.php?username="<?php echo htmlentities ($Admin); ?> ">
+         <?php echo htmlentities ($Admin); ?>
+       </a>
+         On <?php echo htmlentities ( $DateTime); ?> </small>
     <span class="badge badge-dark text-light float-right" style="float:">Comments
        <?php ApproveCommentsAccordingtoPost($PostId) ; ?></span>
 
