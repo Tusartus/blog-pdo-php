@@ -2,6 +2,12 @@
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
 <?php
+
+//protect page first login
+ Confirm_Login(); ?>
+
+
+<?php
 $SearchQueryParameter = $_GET['id'];
 
 //fetching existing content

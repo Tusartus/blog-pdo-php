@@ -1,6 +1,15 @@
 <?php require_once('Includes/DB.php'); ?>
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
+<?php
+
+//folder/posts.php
+$_SESSION["TrackingUrl"]=$_SERVER["PHP_SELF"];
+
+//protect page first login
+ Confirm_Login(); ?>
+
+
 
 <!doctype html>
 <html lang="en">

@@ -1,3 +1,4 @@
+
 <?php require_once('Includes/DB.php'); ?>
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
@@ -5,67 +6,6 @@
 $_SESSION["TrackingUrl"]=$_SERVER["PHP_SELF"];
 //protect page first login
  Confirm_Login(); ?>
-
-<?php
-
-if(isset($_POST["Submit"])){
-  $UserName = $_POST["Username"];
-  $Name = $_POST["Name"];
-  $Password = $_POST["Password"];
-  $ConfirmPassword = $_POST["ConfirmPassword"];
-  $Admin = $_SESSION["AdminName"];
-  date_default_timezone_set("Europe/Berlin");
-  $CurrentTime=time();
-  $DateTime=strftime("%B-%d-%Y %H:%M:%S", $CurrentTime);
-
-
-
-
-  if(empty($UserName) || empty($Password) || empty($ConfirmPassword)){
-    $_SESSION["ErrorMessage"] = "All fields must be filled out";
-    Redirect_to("Admins.php");
-  }elseif (strlen($Password)<4){
-    $_SESSION["ErrorMessage"] = "Password should be greater than 4 characters";
-    Redirect_to("Admins.php");
-
-  }elseif (strlen($Password !==  $ConfirmPassword) >49){
-      $_SESSION["ErrorMessage"] = "Password and confirm Password should match";
-      Redirect_to("Admins.php");
-
-
-}elseif (CheckUserNameExistsOrNot($Username)){
-    $_SESSION["ErrorMessage"] = "Username Exists.Try Another one!";
-    Redirect_to("Admins.php");
-}
-else{
-  // query to insert new admin
-  global $ConnectingDB;
-   $sql = "INSERT INTO admins(datetime, username, password,aname,addedby)";
-   $sql .= "VALUES( :dateTime, :userName, :password;:aName, :adminName)";
-   $stmt = $ConnectingDB ->prepare($sql);
-
-   $stmt->bindValue(':dateTime', $DateTime);
-   $stmt->bindValue(':userName', $UserName);
-   $stmt->bindValue(':password', $Password);
-   $stmt->bindValue(':aName', $Name);
-   $stmt->bindValue(':adminName', $Admin);
-   $Execute =$stmt->execute();
-
-   if($Execute){
-     $_SESSION["SuccessMessage"]="New admin with name of ".$Name." added successfully";
-     Redirect_to("Admins.php");
-   }else {
-     $_SESSION["ErrorMessage"]=" Something went wrong";
-     Redirect_to("Admins.php");
-   }
-
-}
-
-
-}
-
- ?>
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -128,7 +68,7 @@ else{
    <div class="container">
      <div class="row">
        <div class="col-md-12">
-           <h1><i class="fa fa-edit mr-3" style="color:yellow"></i>Manage Admins</h1>
+           <h1><i class="fa fa-comments mr-3" style="color:yellow"></i>Manage comments</h1>
 
         </div>
 
@@ -138,56 +78,132 @@ else{
 </header>
 <!-- end header-->
 <!-- Main area-->
-
 <section class="container py-2 mb-4">
-  <div class="row">
-    <div class="offset-lg-1 col-lg-10" style="min-height:400px;">
-      <?php
-      echo ErrorMessage();
-      echo SuccessMessage();
-       ?>
-      <form class="" action="Admins.php" method="post">
-           <div class="card bg-secondary text-light mb-3">
-         <div class="card-header">
-           <h1>Add new Admin</h1>
-         </div>
-         <div class="card-body bg-dark">
-              <div class="form-group">
-                   <label for="title"><span class="FieldInfo">Username: </span> </label>
-                     <input  class="form-control" type="text" name="Username">
-              </div>
-              <div class="form-group">
-                   <label for="title"><span class="FieldInfo">Name: </span> </label>
-                     <input  class="form-control" type="text" name="Name">
-                     <small class="text-warning text-muted">Optional</small>
-              </div>
-              <div class="form-group">
-                   <label for="title"><span class="FieldInfo">Password: </span> </label>
-                     <input  class="form-control" type="password" name="Password">
-              </div>
-              <div class="form-group">
-                   <label for="title"><span class="FieldInfo">Confirm Password: </span> </label>
-                     <input  class="form-control" type="password" name="ConfirmPassword">
-              </div>
-              <div class="row" style="min-height:50px; background:#D5FFBF;">
-                 <div class="col-lg-6">
-         <a href="Dashboard.php" class="btn btn-warning btn-block"><i class="fas f-arrow-left"></i>Back to Dashboard</a>
-                 </div>
-                 <div class="col-lg-6">
-         <button type="submit" name="Submit" class="btn btn-success btn-block">
-           <i class="fa fa-check">
+   <div class="row" style="min-height:30px;">
+       <div class="col-lg-12" style="min-height:400px;">
+         <?php
+         echo ErrorMessage();
+         echo SuccessMessage();
+          ?>
 
-           </i>Publish</button>
-                 </div>
-              </div>
-            </div>
-           </div>
-     </form>
-    </div>
-  </div>
+           <h2>Approved Comments</h2>
+           <table class="table table-striped table-hover">
+          <thead class="thead-dark">
+      <tr>
+   <th>No. </th>
+   <th>Name </th>
+   <th>Date&Time</th>
+   <th> Comment</th>
+   <th>Approve </th>
+    <th>Action </th>
+   <th>Details</th>
+    </tr>
+          </thead>
+          </table>
+
+        <?php
+   global $ConnectingDB;
+   $sql= "SELECT * FROM comments where status= 'OFF' ORDER BY id desc";
+ $Execute=$ConnectingDB->query($sql);
+ $SrNo = 0;
+ while ($DataRows=$Execute->fetch()){
+    $CommentId = $DataRows["id"];
+    $DateTimeOfComment = $DataRows["datetime"];
+    $CommenterName = $DataRows["name"];
+    $CommentContent = $DataRows["comment"];
+    $CommentPostId = $DataRows["post_id"];
+    $SrNo++;
+  /*
+    if(strlen($CommenterName)> 10) {$CommenterName = substr($CommenterName,0,10).'...';}
+    if(strlen($DateTimeOfComment)> 10) {$DateTimeOfComment = substr($DateTimeOfComment,0,10).'...';}
+
+    */
+         ?>
+<tbody>
+<tr>
+  <td><?php echo htmlentities($SrNo) ; ?></td>
+  <td><?php echo htmlentities($DateTimeOfComment) ; ?> </td>
+  <td> <?php echo htmlentities($CommenterName) ; ?></td>
+
+  <td><?php echo htmlentities($CommentContent); ?> </td>
+    <td> Approve Delete</td>
+    <td> <a class="btn btn-primary" href="ApproveComment.php?id=<?php echo $CommentId; ?>" class="btn btn-success">Approve</a></td>
+    <td> <a class="btn btn-primary" href="DeleteComment.php?id=<?php echo $CommentId; ?>"  class="btn btn-danger">Delete</a></td>
+      <td> <a class="btn btn-primary" href="FullPost.php?id=<?php echo $CommentPostId; ?>" class="btn btn-info" target="_blank">Live preview</a></td>
+  <td><?php echo $SrNo; ?> </td>
+
+
+</tr>
+</tbody>
+<?php  } ?>
+</table>
+
+<!-- Un_Approved comments  -->
+
+<h2>Un_Approved Comments</h2>
+<table class="table table-striped table-hover">
+<thead class="thead-dark">
+<tr>
+<th>No. </th>
+<th>Name </th>
+<th>Date&Time</th>
+<th> Comment</th>
+<th>Revert</th>
+<th>Action </th>
+<th>Details</th>
+</tr>
+</thead>
+</table>
+
+<?php
+global $ConnectingDB;
+$sql= "SELECT * FROM comments where status= 'OFF' ORDER BY id desc";
+$Execute=$ConnectingDB->query($sql);
+$SrNo = 0;
+while ($DataRows=$Execute->fetch()){
+$CommentId = $DataRows["id"];
+$DateTimeOfComment = $DataRows["datetime"];
+$CommenterName = $DataRows["name"];
+$CommentContent = $DataRows["comment"];
+$CommentPostId = $DataRows["post_id"];
+$SrNo++;
+/*
+if(strlen($CommenterName)> 10) {$CommenterName = substr($CommenterName,0,10).'...';}
+if(strlen($DateTimeOfComment)> 10) {$DateTimeOfComment = substr($DateTimeOfComment,0,10).'...';}
+
+*/
+?>
+<tbody>
+<tr>
+<td><?php echo htmlentities($SrNo) ; ?></td>
+<td><?php echo htmlentities($DateTimeOfComment) ; ?> </td>
+<td> <?php echo htmlentities($CommenterName) ; ?></td>
+
+<td><?php echo htmlentities($CommentContent); ?> </td>
+<td> Approve Delete</td>
+<td> <a class="btn btn-primary" href="DisApproveComment.php?id=<?php echo $CommentId; ?>" class="btn btn-warning">DisApprove</a></td>
+<td> <a class="btn btn-primary" href="DeleteComment.php?id=<?php echo $CommentId; ?>"  class="btn btn-danger">Delete</a></td>
+<td> <a class="btn btn-primary" href="FullPost.php?id=<?php echo $CommentPostId; ?>" class="btn btn-info" target="_blank">Live preview</a></td>
+<td><?php echo $SrNo; ?> </td>
+
+
+</tr>
+</tbody>
+<?php  } ?>
+</table>
+
+
+
+
+
+
+       </div>
+
+   </div>
 
 
 </section>
+
 <!-- end main area -->
 
 

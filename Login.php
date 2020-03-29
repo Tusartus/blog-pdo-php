@@ -1,7 +1,12 @@
 <?php require_once('Includes/DB.php'); ?>
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
+
 <?php
+if(isset($_SESSION["UserId"])){
+  Redirect_to("Dashboard.php");
+}
+
 if(isset($_POST["Submit"])){
   $Username = $_POST["Username"];
   $Password = $_POST["Password"];
@@ -18,7 +23,12 @@ if(isset($_POST["Submit"])){
    $_SESSION["AdminName"]= $Found_Account["aname"];
 
    $_SESSION["SuccesMessage"]="Welcome " .$_SESSION["AdminName"];
-   Redirect_to("Dashboard.php");
+   if(isset($_SESSION["TrackingURL"])){
+     Redirect_to($_SESSION["TrackingURL"]);
+   }else{
+     Redirect_to("Dashboard.php");
+   }
+
  }else{
    $_SESSION["ErrorMessage"]="Incorrevct username /password  Admin";
    Redirect_to("Login.php");
