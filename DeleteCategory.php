@@ -6,19 +6,17 @@ if(isset($_GET["id"])){
    $SearchQueryParameter = $_GET["id"];
    global $ConnectingDB;
    $Admin = $_SESSION["AdminName"];
-   $sql = "UPDATE comments Set status='OFF',approvedby='$Admin' WHERE id = '$SearchQueryParameter'";
+   $sql = "DELETE FROM category  WHERE id = '$SearchQueryParameter'";
 
    $Execute = $ConnectingDB->query($sql);
    if($Execute) {
-     $_SESSION["SuccessMessage"]="Comment dis_Approved successfully";
-     Redirect_to["Comments.php"];
+     $_SESSION["SuccessMessage"]="Category DELETED successfully";
+     Redirect_to["Category.php"];
 
    }else{
      $_SESSION["ErrorMessage"]="Something went wrong try again";
-     Redirect_to["Comments.php"];
+     Redirect_to["Categories.php"];
    }
-
-
 
 }
 

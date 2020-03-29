@@ -154,7 +154,38 @@ $_SESSION["TrackingUrl"]=$_SERVER["PHP_SELF"];
       echo $Admin; ?>
          </td>
       <td><img src="Uploads/<?php echo $Image; ?>" width="168px" height="50px"></td>
-      <td>Comments</td>
+      <td>
+
+
+      <?php
+       $Total=ApproveCommentsAccordingtoPost($Id);
+      if($Total){
+        ?>
+          <span class="badge badge-success">
+            <?php
+        echo $Total; ?>
+        </span>
+
+      <?php } ?>
+
+          </span>
+
+      </td>
+      <td>
+
+
+      <?php
+      $Total = DisApproveCommentsAccordingtoPost($Id);
+      if($Total){
+        ?>
+          <span class="badge badge-danger">
+            <?php
+        echo $Total; ?>
+        </span>
+      <?php } ?>
+          </span>
+
+      </td>
       <td>
       <a href="EditPost.php?id=<?php echo $Id; ?>"><span class="btn btn-warning">Edit</span></a>
       <a href="DeletePost.php?id=<?php echo $Id; ?>"><span class="btn btn-danger">  Delete</span></a>

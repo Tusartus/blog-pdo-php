@@ -171,8 +171,8 @@ else {
    <img src="Uploads/<?php echo htmlentities ($Image); ?>" style="max-height:450px;" class="img-fluid card-img-top" />
    <div class="card-body">
        <h4 class="card-title"><?php echo htmlentities($PostTitle);  ?></h4>
-       <small class="card-title">Written by <?php echo htmlentities ($Admin); ?> On <?php echo htmlentities ( $DateTime); ?> </small>
-    <span class="badge badge-dark text-light float-right" style="float:">Comments 20</span>
+       <small class="card-title">Category:<?php echo htmlentities ($Category); ?>  &nbps; & Written by <?php echo htmlentities ($Admin); ?> On <?php echo htmlentities ( $DateTime); ?> </small>
+
 
       <hr>
        <p class="card-text"><?php echo htmlentities ($PostDescription); ?>

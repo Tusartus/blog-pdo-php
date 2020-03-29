@@ -1,11 +1,16 @@
-
 <?php require_once('Includes/DB.php'); ?>
 <?php require_once('Includes/Functions.php'); ?>
 <?php require_once("Includes/Sessions.php"); ?>
 <?php
+
+//folder/posts.php
 $_SESSION["TrackingUrl"]=$_SERVER["PHP_SELF"];
+
 //protect page first login
  Confirm_Login(); ?>
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -68,142 +73,185 @@ $_SESSION["TrackingUrl"]=$_SERVER["PHP_SELF"];
    <div class="container">
      <div class="row">
        <div class="col-md-12">
-           <h1><i class="fa fa-comments mr-3" style="color:yellow"></i>Manage comments</h1>
-
+           <h1><i class="fa fa-blog mr-3" style="color:yellow"></i>Dashboard </h1>
         </div>
+<div class="col-lg-3 mb-2">
+  <a href="AdNewPost.php" class="btn btn-primary btn-block">
+    <i class="fa fa-edit"></i>Add New Post
+ </a>
+</div>
+
+<div class="col-lg-3  mb-2">
+  <a href="Categories.php" class="btn btn-info btn-block">
+    <i class="fa fa-folder-plus"></i>Add New  Category
+ </a>
+</div>
+<div class="col-lg-3  mb-2">
+  <a href="Admins.php" class="btn btn-warning btn-block">
+    <i class="fa fa-user-plus"></i>Add New   Admin
+ </a>
+</div>
+<div class="col-lg-3  mb-2">
+  <a href="Comments.php" class="btn btn-success btn-block">
+    <i class="fa fa-check"></i>Add New  Comments
+ </a>
+</div>
+
+
 
       </div>
-
     </div>
 </header>
 <!-- end header-->
 <!-- Main area-->
 <section class="container py-2 mb-4">
-   <div class="row" style="min-height:30px;">
-       <div class="col-lg-12" style="min-height:400px;">
-         <?php
-         echo ErrorMessage();
-         echo SuccessMessage();
-          ?>
+<div class="row">
+  <div class="col-lg-12">
+    <?php
+    echo ErrorMessage();
+    echo SuccessMessage();
+     ?>
+     <!-- left side area start  -->
+<div class="col-lg-2 d-none d-md-block">
+   <div class="card text-center bg-dark text-white mb-3">
+     <div class="card-body">
+     <h1 class="lead"> Posts</h1>
+       <h4 class="display-5"> <i class="fa fa-readme"></i>
+   <?php
+ TotalPosts();
 
-           <h2>Approved Comments</h2>
-           <table class="table table-striped table-hover">
-          <thead class="thead-dark">
-      <tr>
-   <th>No. </th>
-   <th>Name </th>
-   <th>Date&Time</th>
-   <th> Comment</th>
-   <th>Approve </th>
-    <th>Action </th>
-   <th>Details</th>
-    </tr>
-          </thead>
-          </table>
+    ?>
 
-        <?php
-   global $ConnectingDB;
-   $sql= "SELECT * FROM comments where status= 'OFF' ORDER BY id desc";
- $Execute=$ConnectingDB->query($sql);
- $SrNo = 0;
- while ($DataRows=$Execute->fetch()){
-    $CommentId = $DataRows["id"];
-    $DateTimeOfComment = $DataRows["datetime"];
-    $CommenterName = $DataRows["name"];
-    $CommentContent = $DataRows["comment"];
-    $CommentPostId = $DataRows["post_id"];
-    $SrNo++;
-  /*
-    if(strlen($CommenterName)> 10) {$CommenterName = substr($CommenterName,0,10).'...';}
-    if(strlen($DateTimeOfComment)> 10) {$DateTimeOfComment = substr($DateTimeOfComment,0,10).'...';}
+       </h4>
 
-    */
-         ?>
-<tbody>
-<tr>
-  <td><?php echo htmlentities($SrNo) ; ?></td>
-  <td><?php echo htmlentities($DateTimeOfComment) ; ?> </td>
-  <td> <?php echo htmlentities($CommenterName) ; ?></td>
+     </div>
+     </div>
+     <div class="card text-center bg-dark text-white mb-3">
+       <div class="card-body">
+       <h1 class="lead"> Categories</h1>
+         <h4 class="display-5"> <i class="fa fa-folder"></i>
+           <?php
+     TotalCategories();
 
-  <td><?php echo htmlentities($CommentContent); ?> </td>
-    <td> Approve Delete</td>
-    <td> <a class="btn btn-primary" href="ApproveComment.php?id=<?php echo $CommentId; ?>" class="btn btn-success">Approve</a></td>
-    <td> <a class="btn btn-primary" href="DeleteComment.php?id=<?php echo $CommentId; ?>"  class="btn btn-danger">Delete</a></td>
-      <td> <a class="btn btn-primary" href="FullPost.php?id=<?php echo $CommentPostId; ?>" class="btn btn-info" target="_blank">Live preview</a></td>
-  <td><?php echo $SrNo; ?> </td>
-
-
-</tr>
-</tbody>
-<?php  } ?>
-</table>
-
-<!-- Un_Approved comments  -->
-
-<h2>Un_Approved Comments</h2>
-<table class="table table-striped table-hover">
-<thead class="thead-dark">
-<tr>
-<th>No. </th>
-<th>Name </th>
-<th>Date&Time</th>
-<th> Comment</th>
-<th>Revert</th>
-<th>Action </th>
-<th>Details</th>
-</tr>
-</thead>
-</table>
-
-<?php
-global $ConnectingDB;
-$sql= "SELECT * FROM comments where status= 'ON' ORDER BY id desc";
-$Execute=$ConnectingDB->query($sql);
-$SrNo = 0;
-while ($DataRows=$Execute->fetch()){
-$CommentId = $DataRows["id"];
-$DateTimeOfComment = $DataRows["datetime"];
-$CommenterName = $DataRows["name"];
-$CommentContent = $DataRows["comment"];
-$CommentPostId = $DataRows["post_id"];
-$SrNo++;
-/*
-if(strlen($CommenterName)> 10) {$CommenterName = substr($CommenterName,0,10).'...';}
-if(strlen($DateTimeOfComment)> 10) {$DateTimeOfComment = substr($DateTimeOfComment,0,10).'...';}
-
-*/
-?>
-<tbody>
-<tr>
-<td><?php echo htmlentities($SrNo) ; ?></td>
-<td><?php echo htmlentities($DateTimeOfComment) ; ?> </td>
-<td> <?php echo htmlentities($CommenterName) ; ?></td>
-
-<td><?php echo htmlentities($CommentContent); ?> </td>
-<td> Approve Delete</td>
-<td> <a class="btn btn-primary" href="DisApproveComment.php?id=<?php echo $CommentId; ?>" class="btn btn-warning">DisApprove</a></td>
-<td> <a class="btn btn-primary" href="DeleteComment.php?id=<?php echo $CommentId; ?>"  class="btn btn-danger">Delete</a></td>
-<td> <a class="btn btn-primary" href="FullPost.php?id=<?php echo $CommentPostId; ?>" class="btn btn-info" target="_blank">Live preview</a></td>
-<td><?php echo $SrNo; ?> </td>
-
-
-</tr>
-</tbody>
-<?php  } ?>
-</table>
-
-
-
-
-
+            ?>
+            </h4>
 
        </div>
+       </div>
+       <div class="card text-center bg-dark text-white mb-3">
+         <div class="card-body">
+         <h1 class="lead"> Admins</h1>
+           <h4 class="display-5"> <i class="fa fa-user"></i>
+             <?php
 
-   </div>
+       TotalAdmins();
+              ?>
+             </h4>
+
+         </div>
+         </div>
+         <div class="card text-center bg-dark text-white mb-3">
+           <div class="card-body">
+           <h1 class="lead">Comments</h1>
+             <h4 class="display-5"> <i class="fa fa-comments"></i>
+               <?php
+         TotalComments();
+                ?>
+
+                </h4>
+
+           </div>
+           </div>
+
+
+
+</div>
+ <!-- end  left side area   -->
+ <!--  right side area   -->
+<div class="col-lg-10">
+  <h1> Top Posts </h1>
+  <table class="table table-striped table-hover">
+     <thead class="thead-dark">
+       <tr>
+     <th> No. </th>
+     <th>Title </th>
+     <th> Date&Time </th>
+     <th> Author</th>
+     <th>Comments </th>
+     <th> Details</th>
+
+       </tr>
+     </thead>
+   <?php
+global $ConnectingDB;
+$sql= "SELECT * FROM posts ORDER BY id desc LIMIT 0,5";
+$stmt = $ConnectingDB->query($sql);
+while($DataRows=$stmt->fetch()){
+  $PostId= $DataRows["id"];
+  $DateTime = $DataRows["datetime"];
+  $author = $DataRows["author"];
+  $Title = $DataRows["title"];
+  $SrNo++;
+
+
+
+    ?>
+    <tbdoy>
+  <tr>
+<td>  <?php echo $SrNo; ?> </td>
+<td>   <?php echo $Title; ?>   </td>
+<td>   <?php echo $DateTime; ?>   </td>
+<td>   <?php echo $Author; ?>   </td>
+<td>
+
+
+<?php
+ $Total=ApproveCommentsAccordingtoPost($PostId);
+if($Total){
+  ?>
+    <span class="badge badge-success">
+      <?php
+  echo $Total; ?>
+  </span>
+
+<?php } ?>
+
+    </span>
+
+</td>
+<td>
+
+
+<?php
+$Total = DisApproveCommentsAccordingtoPost($PostId);
+if($Total){
+  ?>
+    <span class="badge badge-danger">
+      <?php
+  echo $Total; ?>
+  </span>
+<?php } ?>
+    </span>
+
+</td>
+
+<td><a target="_blank" href="FullPost.php?id=<?php echo $PostId; ?>" <span class="btn btn-info"> Preview </span> </a></td>
+
+  </tr>
+
+</tbody>
+
+  <?php } ?>
+  </table>
+
+</div>
+
+ <!-- end  right side area   -->
+  </div>
+</div>
 
 
 </section>
-
 <!-- end main area -->
 
 

@@ -158,6 +158,60 @@ if(isset($_POST["Submit"])){
             </div>
            </div>
      </form>
+
+     <h2>Existing categories</h2>
+     <table class="table table-striped table-hover">
+    <thead class="thead-dark">
+<tr>
+<th>No. </th>
+<th>Date&Time</th>
+<th>Category Name </th>
+
+<th>Creator name</th>
+
+<th>Action </th>
+
+</tr>
+    </thead>
+    </table>
+
+  <?php
+global $ConnectingDB;
+$sql= "SELECT * FROM category ORDER BY id desc";
+$Execute=$ConnectingDB->query($sql);
+$SrNo = 0;
+while ($DataRows=$Execute->fetch()){
+  //datetime title author are from table category in database
+$CategoryId = $DataRows["id"];
+$CategoryDate = $DataRows["datetime"];
+$CateegoryName = $DataRows["title"];
+$CreatorName = $DataRows["author"];
+$SrNo++;
+/*
+if(strlen($CommenterName)> 10) {$CommenterName = substr($CommenterName,0,10).'...';}
+if(strlen($DateTimeOfComment)> 10) {$DateTimeOfComment = substr($DateTimeOfComment,0,10).'...';}
+
+*/
+   ?>
+<tbody>
+<tr>
+<td><?php echo htmlentities($SrNo) ; ?></td>
+<td><?php echo htmlentities($CategoryDate) ; ?> </td>
+<td> <?php echo htmlentities($CategoryName) ; ?></td>
+<td> <?php echo htmlentities($CreatorName) ; ?></td>
+
+<td> <a class="btn btn-primary" href="DeleteCategory.php?id=<?php echo $CategoryId; ?>"  class="btn btn-danger">Delete</a></td>
+
+
+
+
+</tr>
+</tbody>
+<?php  } ?>
+</table>
+
+
+
     </div>
   </div>
 
